@@ -1,0 +1,147 @@
+<?xml version="1.0"?>
+<!--
+    Licensed Materials - Property of IBM
+    (c) Copyright IBM Corporation 2010, 2012. All Rights Reserved.
+    
+    Note to U.S. Government Users Restricted Rights:  
+    Use, duplication or disclosure restricted by GSA ADP Schedule 
+    Contract with IBM Corp. 
+ -->
+
+<rdf:RDF
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:dc="http://purl.org/dc/terms/"
+	xmlns:jfs="http://jazz.net/xmlns/foundation/1.0/"
+	xmlns:jfs3="http://jazz.net/xmlns/prod/jazz/jfs/3.0/"
+	xmlns:ju="http://jazz.net/ns/ui#"
+	xmlns:jd="http://jazz.net/xmlns/prod/jazz/discovery/1.0/"
+	xmlns:jdb="http://jazz.net/xmlns/prod/jazz/dashboard/1.0/"
+	xmlns:jtp="http://jazz.net/xmlns/prod/jazz/jtp/0.6/"
+	xmlns:oslc_cm="http://open-services.net/xmlns/cm/1.0/"
+	xmlns:oslc_scm="http://open-services.net/xmlns/scm/1.0/"
+	xmlns:oslc="http://open-services.net/ns/core#"
+	xmlns:trs="http://jazz.net/ns/trs#"
+>
+<!--
+Service Contribution Resource document for the CCM application.
+-->
+	<!-- Application properties -->
+	<jd:Application>
+		<oslc:publisher rdf:resource="%server-URL%/application-about"/>
+		<jd:contextRoot>%server-URL%</jd:contextRoot>
+		<jd:rootServices rdf:resource="%server-URL%/rootservices" />
+		<jd:registration rdf:resource="%server-URL%/service/com.ibm.team.repository.service.internal.setup.IRegistrationHandlerService" />
+    	<jd:domain rdf:parseType="Resource">
+      		<dc:identifier>http://open-services.net/ns/cm#</dc:identifier>
+    	</jd:domain>
+	</jd:Application>
+	
+	<!-- 4.0 license compatibility -->
+	<jfs:compatibleLicenseBehavior jfs:id="ConfigurationAndChangeManagement-4.0"/>
+		
+	<!-- Home menu service -->
+	<ju:HomeMenu>
+		<jd:service rdf:resource="%server-URL%/home-menu-project"/>
+		<ju:menuSection rdf:resource="http://jazz.net/ns/ui/menuSection#project"/>
+		<oslc:publisher rdf:resource="%server-URL%/application-about"/>
+		<!-- Leaving default icon here for now until home menu supports icon from application-about -->
+		<ju:defaultIcon rdf:resource="%server-URL%/web/com.ibm.team.rtc.web/ui/graphics/UICustomizations/RTC_16.png"/>
+		<jd:contextRoot>%server-URL%</jd:contextRoot> 
+	</ju:HomeMenu>
+	
+	<!-- Admin home service -->
+    <jfs:AdminHome>
+      <jd:service rdf:resource="%server-URL%/admin-home"/>
+      <jd:contextRoot>%server-URL%</jd:contextRoot>  
+      <oslc:publisher rdf:resource="%server-URL%/application-about"/>	  
+    </jfs:AdminHome>	
+	
+	<!--  Server Rename Status -->
+    <jfs:ServerRenameStatus jd:visibility="http://jazz.net/xmlns/prod/jazz/discovery/1.0/public">
+      <jd:service rdf:resource="%server-URL%/appServerRenameStatus" />
+    </jfs:ServerRenameStatus>
+    
+	<!--  Server Rename URL Provider -->
+    <jfs:RenameURLProvider jd:visibility="http://jazz.net/xmlns/prod/jazz/discovery/1.0/private">
+	  <jd:service rdf:resource="%server-URL%/service/com.ibm.team.repository.service.mapping.IRenameURLProviderService"/>
+    </jfs:RenameURLProvider>
+
+	<!--  Server Rename verification URL service -->
+	<jfs:RenameVerificationURLProvider jd:visibility="http://jazz.net/xmlns/prod/jazz/discovery/1.0/private">
+	    <jd:service rdf:resource="%server-URL%/service/com.ibm.team.repository.service.rename.rest.IServerRenameVerificationURLService"/>
+	</jfs:RenameVerificationURLProvider>
+
+	<!-- Process authoring practice service. This service is provisional and may change in the next release. -->
+  	<jtp:Practices jd:visibility="http://jazz.net/xmlns/prod/jazz/discovery/1.0/public">
+  	  <jd:service rdf:resource="%server-URL%/process-authoring/practices" />
+  	</jtp:Practices>
+  
+	<!-- Process authoring description service. This service is provisional and may change in the next release. -->
+	<jtp:ProcessDescriptions jd:visibility="http://jazz.net/xmlns/prod/jazz/discovery/1.0/public">
+	  <jd:service rdf:resource="%server-URL%/process-authoring/descriptions" />
+	</jtp:ProcessDescriptions>
+	
+	<!-- Process authoring file service. This service is provisional and may change in the next release. -->
+	<jtp:File jd:visibility="http://jazz.net/xmlns/prod/jazz/discovery/1.0/public">
+	  <jd:service rdf:resource="%server-URL%/process-authoring/file"/>
+	</jtp:File>
+		  
+	<!--Process authoring default practice library location. This service is provisional and may change in the next release. -->
+	<jtp:DefaultPracticeLibraryUrl jd:visibility="http://jazz.net/xmlns/prod/jazz/discovery/1.0/public">
+	  <jd:service rdf:resource="%server-URL%/process-authoring/libraries/shared"/>
+	</jtp:DefaultPracticeLibraryUrl>
+	  
+	<!-- Process authoring associations service. This service is provisional and may change in the next release. -->
+	<jtp:Associations jd:visibility="http://jazz.net/xmlns/prod/jazz/discovery/1.0/public">
+	  <jd:service rdf:resource="%server-URL%/process-authoring/associations"/>
+	</jtp:Associations>
+	  
+	<!-- Process authoring license service. This service is provisional and may change in the next release. -->
+	<jtp:License jd:visibility="http://jazz.net/xmlns/prod/jazz/discovery/1.0/public">
+	  <jd:service rdf:resource="%server-URL%/process-authoring/license"/>
+	</jtp:License>
+	
+	<!-- Personal dashboard template -->
+	<jdb:PersonalDashboardTemplate>
+		<jd:service rdf:resource="%server-URL%/dashboard-template"/>
+		<jdb:projectScoped>true</jdb:projectScoped>
+	</jdb:PersonalDashboardTemplate>
+	
+	<oslc_cm:CmServiceProviders>
+	    <jd:service rdf:resource="%server-URL%/oslc/workitems/catalog" />
+	</oslc_cm:CmServiceProviders>
+	
+	<trs:TrackedResourceSetProvider>
+		<trs:trackedResourceSet rdf:resource="%server-URL%/oslc/workitems/trs" />
+	</trs:TrackedResourceSetProvider>
+	
+	<oslc_scm:ScmServiceProviders>
+	    <jd:service rdf:resource="%server-URL%/oslc-scm/catalog" />
+	</oslc_scm:ScmServiceProviders>
+	
+	<!-- CQ Synchronizer license key provider -->
+	<jfs3:licenseKeyProvider jd:visibility="http://jazz.net/xmlns/prod/jazz/discovery/1.0/public">
+		<jd:service rdf:resource="%server-URL%/web/com.ibm.team.rtc.web/license/RTC_CQ-Synchronizer_Unlocked.jar" />
+	</jfs3:licenseKeyProvider>
+	
+	<!-- CC Synchronizer license key provider -->
+	<jfs3:licenseKeyProvider jd:visibility="http://jazz.net/xmlns/prod/jazz/discovery/1.0/public">
+		<jd:service rdf:resource="%server-URL%/web/com.ibm.team.rtc.web/license/RTC_CC-Synchronizer_Unlocked.jar" />
+	</jfs3:licenseKeyProvider>
+	
+	<!-- Build System license key provider -->
+  	<jfs3:licenseKeyProvider jd:visibility="http://jazz.net/xmlns/prod/jazz/discovery/1.0/public">
+  		<jd:service rdf:resource="%server-URL%/web/com.ibm.team.rtc.web/license/RTC_BuildSystem_Unlocked.jar" />
+	</jfs3:licenseKeyProvider>
+	
+	<!-- Data Collector license key provider -->
+  	<jfs3:licenseKeyProvider jd:visibility="http://jazz.net/xmlns/prod/jazz/discovery/1.0/public">
+		<jd:service rdf:resource="%server-URL%/web/com.ibm.team.rtc.web/license/CCM_Data_Collector_Unlocked.jar" />
+  	</jfs3:licenseKeyProvider>
+  
+	<!-- Default license key provider -->
+  	<jfs3:licenseKeyProvider jd:visibility="http://jazz.net/xmlns/prod/jazz/discovery/1.0/public">
+	  <jd:service rdf:resource="%server-URL%/web/com.ibm.team.rtc.web/license/RTC_Default.jar" />
+  	</jfs3:licenseKeyProvider>
+	
+</rdf:RDF>

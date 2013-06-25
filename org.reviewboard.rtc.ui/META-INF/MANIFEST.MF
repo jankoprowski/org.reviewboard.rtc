@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: org.reviewboard.rtc.ui
+Bundle-SymbolicName: org.reviewboard.rtc.ui;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.reviewboard.rtc.ui.Activator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ com.ibm.team.workitem.ide.ui;bundle-version="3.1.200",
+ com.ibm.team.process.ide.ui,
+ org.eclipse.ui.forms;bundle-version="3.5.2",
+ com.ibm.team.foundation.common;bundle-version="1.2.100"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6

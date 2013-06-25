@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/org.reviewboard.rtc.ui.feature_1.0.0.201306091800.jar" id="org.reviewboard.rtc.ui.feature" version="1.0.0.201306091800"/>
+</site>

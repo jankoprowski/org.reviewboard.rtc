@@ -1,0 +1,24 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: ReviewBoard RTC Follow-up
+Bundle-SymbolicName: org.reviewboard.rtc;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.reviewboard.rtc.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ com.ibm.team.process.common;bundle-version="1.2.1200",
+ com.ibm.team.process.service;bundle-version="1.2.1200",
+ com.ibm.team.workitem.common;bundle-version="3.1.400",
+ com.ibm.team.repository.common;bundle-version="1.3.1200",
+ com.ibm.team.repository.service;bundle-version="1.2.1200",
+ com.ibm.team.workitem.service;bundle-version="3.1.200",
+ com.ibm.team.scm.common;bundle-version="3.1.200",
+ com.ibm.team.filesystem.common;bundle-version="3.1.300",
+ com.ibm.team.scm.service;bundle-version="3.1.400"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ClassPath: lib/gson-2.2.3.jar,
+ lib/jersey-core-1.17.jar,
+ lib/jersey-client-1.17.jar,
+ lib/jersey-multipart-1.17.1.jar,
+ lib/diffutils-1.2.1.jar,
+ .

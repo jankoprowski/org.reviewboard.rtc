@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="com.ibm.team.repository.common.components">
+      <component
+            id="org.reviewboard.rtc.reviewWorkItem"
+            name="Review Board">
+      </component>
+   </extension>
+    <extension
+         point="com.ibm.team.repository.service.serviceProvider">
+      <serviceProvider
+            componentId="org.reviewboard.rtc.reviewWorkItem"
+            implementationClass="org.reviewboard.rtc.ReviewBoardConfigurationProperties">
+         <provides>
+            <providedService
+                  interface="org.reviewboard.rtc.IReviewBoardConfigurationProperties">
+            </providedService>
+         </provides>
+         <prerequisites>
+            <configurationProperties>
+               <configurationProperty
+                     accessPolicy="RESTRICTED"
+                     default="reviewboard"
+                     description="Username"
+                     displayableName="Username"
+                     name="username"
+                     required="false"
+                     type="STRING"
+                     updatePolicy="NO_RESTART_REQUIRED">
+               </configurationProperty>
+               <configurationProperty
+                     accessPolicy="SENSITIVE"
+                     default="password"
+                     description="Password"
+                     displayableName="Password"
+                     name="password"
+                     required="true"
+                     type="STRING"
+                     updatePolicy="NO_RESTART_REQUIRED">
+               </configurationProperty>
+            </configurationProperties>
+         </prerequisites>
+      </serviceProvider>
+   </extension>
+   <extension
+         point="com.ibm.team.process.service.operationParticipants">
+      <operationParticipant
+            class="org.reviewboard.rtc.ReviewWorkItemParticipant"
+            id="org.reviewboard.rtc.reviewWorkItem"
+            name="[ReviewBoard] Review Work Item"
+            operationId="com.ibm.team.workitem.operation.workItemSave">
+         <extensionService
+               componentId="org.reviewboard.rtc.reviewWorkItem"
+               implementationClass="org.reviewboard.rtc.ReviewWorkItemParticipant">
+            <prerequisites>
+            	<requiredService interface="com.ibm.team.repository.service.IRepositoryItemService" />
+            	<requiredService interface="com.ibm.team.links.common.service.ILinkService" />            	
+            	<requiredService interface="com.ibm.team.workitem.service.IWorkItemServer" />
+            	<requiredService interface="com.ibm.team.scm.service.IServerSideVersionedContentService" />
+            	<requiredService interface="com.ibm.team.scm.common.IScmService" />
+            	<requiredService interface="com.ibm.team.scm.common.internal.IScmQueryService" />
+            	<requiredService interface="org.reviewboard.rtc.IReviewBoardConfigurationProperties" />
+            	<requiredService interface="com.ibm.team.workitem.common.internal.ILinkClosureService" />            	      	
+            </prerequisites>
+         </extensionService>
+      </operationParticipant>
+   </extension>
+</plugin>

@@ -1,0 +1,314 @@
+diff --git a/reviewboard/scmtools/admin.py b/reviewboard/scmtools/admin.py
+index 4da447d..9f1f790 100644
+--- a/reviewboard/scmtools/admin.py
++++ b/reviewboard/scmtools/admin.py
+@@ -33,6 +33,7 @@ class RepositoryAdmin(admin.ModelAdmin):
+                 'username',
+                 'password',
+                 'use_ticket_auth',
++                'use_basic_auth',
+             ),
+             'classes': ('wide',),
+         }),
+diff --git a/reviewboard/scmtools/core.py b/reviewboard/scmtools/core.py
+index 2ad9fda..86f4fae 100644
+--- a/reviewboard/scmtools/core.py
++++ b/reviewboard/scmtools/core.py
+@@ -56,6 +56,7 @@ class SCMTool(object):
+     supports_authentication = False
+     supports_raw_file_urls = False
+     supports_ticket_auth = False
++    supports_basic_auth = False
+     field_help_text = {
+         'path': 'The path to the repository. This will generally be the URL '
+                 'you would use to check out the repository.',
+diff --git a/reviewboard/scmtools/forms.py b/reviewboard/scmtools/forms.py
+index 2b5133e..fb23e24 100644
+--- a/reviewboard/scmtools/forms.py
++++ b/reviewboard/scmtools/forms.py
+@@ -155,6 +155,12 @@ class RepositoryForm(forms.ModelForm):
+         initial=False,
+         required=False)
+ 
++    # Rational Team Concert specific fields
++    use_basic_auth = forms.BooleanField(
++        label=_("Use HTTP Basic authentication"),
++        initial=False,
++        required=False)
++
+     def __init__(self, *args, **kwargs):
+         self.local_site_name = kwargs.pop('local_site_name', None)
+ 
+@@ -345,6 +351,8 @@ class RepositoryForm(forms.ModelForm):
+         """
+         self.fields['use_ticket_auth'].initial = \
+             self.instance.extra_data.get('use_ticket_auth', False)
++        self.fields['use_basic_auth'].initial = \
++            self.instance.extra_data.get('use_basic_auth', False)
+ 
+     def _populate_hosting_service_fields(self):
+         """Populates all the main hosting service fields in the form.
+@@ -976,6 +984,8 @@ class RepositoryForm(forms.ModelForm):
+         try:
+             repository.extra_data['use_ticket_auth'] = \
+                 self.cleaned_data['use_ticket_auth']
++            repository.extra_data['use_basic_auth'] = \
++                self.cleaned_data['use_basic_auth']
+         except KeyError:
+             pass
+ 
+diff --git a/reviewboard/scmtools/models.py b/reviewboard/scmtools/models.py
+index 23c6a4f..8820797 100644
+--- a/reviewboard/scmtools/models.py
++++ b/reviewboard/scmtools/models.py
+@@ -31,6 +31,8 @@ class Tool(models.Model):
+         lambda x: x.scmtool_class.supports_raw_file_urls)
+     supports_ticket_auth = property(
+         lambda x: x.scmtool_class.supports_ticket_auth)
++    supports_basic_auth = property(
++        lambda x: x.scmtool_class.supports_basic_auth)
+     field_help_text = property(
+         lambda x: x.scmtool_class.field_help_text)
+ 
+diff --git a/reviewboard/scmtools/rtc.py b/reviewboard/scmtools/rtc.py
+new file mode 100644
+index 0000000..3ad47e9
+--- /dev/null
++++ b/reviewboard/scmtools/rtc.py
+@@ -0,0 +1,200 @@
++import cookielib
++import posixpath
++import re
++import socket
++
++from urllib import urlencode
++from urllib2 import build_opener, ProxyHandler, ProxyBasicAuthHandler, \
++                    Request, HTTPCookieProcessor
++from urlparse import urljoin, urlparse
++
++from reviewboard.diffviewer.parser import DiffParser, DiffParserError
++from reviewboard.scmtools.core import SCMTool, PRE_CREATION
++from reviewboard.scmtools.errors import SCMError, AuthenticationError
++
++DEV_NULL = '/dev/null'
++
++class RTCTool(SCMTool):
++    name = "RTC"
++    uses_atomic_revisions = True
++    supports_authentication = True
++    supports_basic_auth = True
++    supports_raw_file_urls = False
++    field_help_text = {
++        'path': 'This should be CCM server address in'
++                ' form http(s)://hostname:port/ccm/.'
++    }
++
++    before_states = None
++
++    def __init__(self, repository):
++        username = repository.username
++        password = repository.password
++        if not (username and password):
++            error = "Username and password must be set."
++            raise AuthenticationError(msg=error)
++        self.client = RTCClient(repository)
++
++    def get_fields(self):
++        return ['diff_path']
++
++    def get_diffs_use_absolute_paths(self):
++        return True
++
++    def get_parser(self, data):
++        return RTCDiffParser(data, self)
++
++    def get_file(self, filename, revision):
++        if PRE_CREATION == revision:
++            return ''
++        return self.client.get_file(revision)
++
++    def parse_diff_revision(self, filename, revision, *args, **kwargs):
++        if filename == DEV_NULL:
++            filename = ''
++        return filename, revision
++
++
++class RTCDiffParser(DiffParser):
++
++
++    # Taken from: com.ibm.team.filesystem.client.internal.patches.CreatePatchUtil
++    JAZZ_PATCH_HEADER = "### Jazz Patch 1.0"
++    RB_PATCH_HEADER = "### Review Patch 1.0"
++    BEFORE_STATE = re.compile(r'#before_state: "(\S+)" "(\S+)" "(\S+)"')
++
++    tool = None
++
++    def __init__(self, data, tool):
++        super(RTCDiffParser, self).__init__(data)
++        self.tool = tool
++
++    def parse_special_header(self, linenum, info):
++        """Parse all lines begining with # collecting before_states revisions.
++        """
++        if self.tool.before_states != None:
++            return linenum
++
++        self.tool.before_states= {DEV_NULL: PRE_CREATION}
++
++        header = self.lines[linenum]
++
++        if not (header.startswith(self.JAZZ_PATCH_HEADER) or
++           header.startswith(self.RB_PATCH_HEADER)):
++            raise DiffParserError("Malformed patch header.", 0)
++
++        for line in self.lines:
++            if not line.startswith('#'):
++                break
++            linenum += 1
++            m = self.BEFORE_STATE.match(line)
++            if m:
++                filename, item_id, state_id = m.groups()
++                revision = posixpath.join(item_id, state_id)
++                self.tool.before_states[filename] = revision
++
++        return linenum
++
++    def parse_diff_header(self, linenum, info):
++        """Replace diff's timestamp with Jazz Patch revisions.
++        """
++
++        linenum = super(RTCDiffParser, self).parse_diff_header(linenum, info)
++
++        if 'origFile' in info and 'newFile' in info:
++            newFile = info['newFile']
++            origFile = info['origFile']
++
++            info['newInfo'] = ''
++            info['origInfo'] = self.tool.before_states[origFile]
++            info['newFile'] = self.__sanitize_filename(newFile)
++            info['origFile'] = self.__sanitize_filename(origFile)
++
++            if newFile == DEV_NULL:
++                info['deleted'] = True
++                info['newFile'] = ''
++            elif newFile != origFile and origFile != DEV_NULL:
++                info['moved'] = True
++            if self.lines[linenum].startswith('Binary'):
++                info['binary'] = True
++
++        return linenum
++
++    def __sanitize_filename(self, filename):
++        """Sanitize 'unresolved' parts from diff filename.
++        """
++        if filename.startswith("unresolved"):
++            return posixpath.join(filename.split(posixpath.sep)[2:])
++        return filename
++
++class RTCClient(object):
++
++    def __init__(self, repository):
++        self.logged_in = False
++        self.repository = repository
++        self.url = urlparse(repository.path)
++        self.basicauth = repository.extra_data.get('use_basic_auth', False)
++
++    def login(self):
++        """Authenticate against Rational Team Concert server.
++        """
++        if self.basicauth:
++            self.__add_basic_headers()
++        else:
++            self.__send_auth_form()
++        self.logged_in = True
++
++
++    def get_file(self, revision):
++        """Return file content from Rational Team Concert server.
++        """
++        if not self.logged_in:
++            self.login()
++        res = self.__req("service/com.ibm.team.filesystem.common.IFileContentService/content/%s" % revision)
++        return res.read()
++
++    def __req(self, url, data=None):
++        """Send request to Rational Team Concert server.
++        """
++        headers = {'User-Agent': 'Python 2.x/urllib2'}
++        ok = 200
++        url = urljoin(self.url.geturl(), url)
++        req = Request(url, headers=headers)
++        if data:
++            data = urlencode(data)
++            req.add_data(data)
++        try:
++            res = self.opener.open(req)
++        except Exception:
++            raise SCMError("Cannot reach '%s'." % url)
++        if res.getcode() != ok:
++            raise SCMError("Cannot reach '%s'." % url)
++        return res
++        
++
++    def __add_basic_headers(self, username, password):
++         """Authenticate against RTC server configured in BASIC auth-method.
++         """
++         scheme = self.url.scheme
++         url = self.url.geturl()
++         realm = 'Jazz'
++         hostname = socket.gethostname()
++         username = self.repository.username
++         password = self.repository.password
++         proxy_handler = ProxyHandler({scheme: url})
++         proxy_auth_handler = ProxyBasicAuthHandler()
++         proxy_auth_handler.add_password(realm, hostname, username, password)
++         self.opener = build_opener(proxy_handler, proxy_auth_handler)
++
++    def __send_auth_form(self):
++         """Authenticate against RTC server configured in FORM auth-method.
++         """
++         username = self.repository.username
++         password = self.repository.password
++         cookie_jar = cookielib.CookieJar()
++         self.opener = build_opener(HTTPCookieProcessor(cookie_jar))
++         self.__req("authenticated/identity")
++         data = {'j_username': username, 'j_password': password}
++         res = self.__req("authenticated/j_security_check", data)
++         if 'authfailed' in res.read():
++             raise SCMError("Authentication failed. Check credentials.")
+diff --git a/reviewboard/templates/admin/repository_fields.js b/reviewboard/templates/admin/repository_fields.js
+index 57f9633..1546045 100644
+--- a/reviewboard/templates/admin/repository_fields.js
++++ b/reviewboard/templates/admin/repository_fields.js
+@@ -4,7 +4,8 @@ var HOSTING_SERVICES = {{form.hosting_service_info|json_dumps:2}};
+ 
+ var TOOLS_INFO = {
+     "none": {
+-        fields: [ "raw_file_url", "username", "password", "use_ticket_auth" ],
++        fields: [ "raw_file_url", "username", "password", "use_ticket_auth",
++                  "use_basic_auth" ],
+     },
+ 
+ {% for tool in form.tool.field.queryset %}
+@@ -16,6 +17,9 @@ var TOOLS_INFO = {
+ {%  if tool.supports_ticket_auth %}
+            "use_ticket_auth",
+ {% endif %}
++{%  if tool.supports_basic_auth %}
++           "use_basic_auth",
++{% endif %}
+            "username", "password"
+         {% endspaceless %} ],
+         help_text: {{tool.field_help_text|json_dumps:2}}
+diff --git a/setup.py b/setup.py
+index 3091f51..cb8504e 100755
+--- a/setup.py
++++ b/setup.py
+@@ -153,6 +153,7 @@ setup(name=PACKAGE_NAME,
+               'perforce = reviewboard.scmtools.perforce:PerforceTool',
+               'plastic = reviewboard.scmtools.plastic:PlasticTool',
+               'svn = reviewboard.scmtools.svn:SVNTool',
++              'rtc = reviewboard.scmtools.rtc:RTCTool',
+           ],
+           'reviewboard.auth_backends': [
+               'ad = reviewboard.accounts.backends:ActiveDirectoryBackend',

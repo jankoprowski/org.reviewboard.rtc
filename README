@@ -1,0 +1,18 @@
+This is very early version of Rational Team Concert - Review Board integration.
+
+Installation
+------------
+
+1. Patch your Review Board server source code using 'reviewboard.patch' file.
+2. Build 'org.reviewboard.rtc.ui.update-site' and put 'org.reviewboard.rtc.ui_1.0.0.TIMESTAMP.jar'
+in your RTC Eclipse 'dropins' directory. If directory if missing create it.
+4. Stop RTC server
+5. Put 'reviewboard-profile.ini' inside your RTC 'server/conf/ccm/provision_profiles' directory
+6. Build and copy 'org.reviewboard.rtc.update-site' directory in 'server/conf/ccm/sites' directory
+7. Start RTC server
+8. Configure Review Board credentials under https://localhost:9443/ccm/admin#action=com.ibm.team.repository.admin.configureAdvanced
+9. Turn on '[ReviewBoard] Review Work Item' follow-up action for work item save and configure it using eclipse plugin. See #2.
+
+Plugin created against RTC 4.0.2
+
+ 

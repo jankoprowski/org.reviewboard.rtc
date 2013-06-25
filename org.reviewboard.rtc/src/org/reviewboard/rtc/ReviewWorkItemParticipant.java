@@ -57,7 +57,7 @@ public class ReviewWorkItemParticipant extends AbstractService implements IOpera
 
 		try {
 
-			WorkItemInformationRetriever workItem = constructReviewWorkItem(iWorkItem, teamAdvisor);
+			WorkItemInformationRetriever workItem = constructReviewWorkItem(iWorkItem);
 			if (workItem.getChangeSets().isEmpty()) {
 				teamAdvisor.info(NO_CHANGE_SETS_TO_REVIEW);
 				return;
@@ -104,10 +104,10 @@ public class ReviewWorkItemParticipant extends AbstractService implements IOpera
 		}
 	}
 
-	private WorkItemInformationRetriever constructReviewWorkItem(IWorkItem rtcWorkItem, TeamAdvisor teamAdvisor) {
+	private WorkItemInformationRetriever constructReviewWorkItem(IWorkItem rtcWorkItem) {
 		ILinkService linkService = getService(ILinkService.class);
 		IRepositoryItemService repositoryItemService = getService(IRepositoryItemService.class);
-		WorkItemInformationRetriever workItem = new WorkItemInformationRetriever(rtcWorkItem, repositoryItemService, linkService, teamAdvisor);
+		WorkItemInformationRetriever workItem = new WorkItemInformationRetriever(rtcWorkItem, repositoryItemService, linkService);
 		return workItem;
 	}
 

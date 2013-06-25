@@ -36,8 +36,6 @@ import com.ibm.team.workitem.common.model.WorkItemLinkTypes;
 
 public class WorkItemInformationRetriever {
 
-	private static final String CHANGESET_ACCESS_DENIED = "Changeset '%s' access denied.";
-
 	private static final String APPROVAL_REVIEWER_TYPE = "com.ibm.team.workitem.approvalType.review";
 
 	private static final String TIMESTAMP_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
@@ -53,10 +51,7 @@ public class WorkItemInformationRetriever {
 
 	private final Gson gson;
 
-	private final TeamAdvisor teamAdvisor;
-
-	public WorkItemInformationRetriever(IWorkItem workitem, IRepositoryItemService repositoryItemService, ILinkService linkService, TeamAdvisor teamAdvisor) {
-		this.teamAdvisor = teamAdvisor;
+	public WorkItemInformationRetriever(IWorkItem workitem, IRepositoryItemService repositoryItemService, ILinkService linkService) {
 		this.gson = new GsonBuilder().setDateFormat(TIMESTAMP_DATE_FORMAT).create();
 		this.workItem = workitem;
 		this.linkService = linkService;

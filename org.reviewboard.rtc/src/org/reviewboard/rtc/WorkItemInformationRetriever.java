@@ -14,8 +14,6 @@ import com.ibm.team.links.common.ILink;
 import com.ibm.team.links.common.ILinkCollection;
 import com.ibm.team.links.common.IReference;
 import com.ibm.team.links.common.factory.IReferenceFactory;
-import com.ibm.team.links.common.registry.IEndPointDescriptor;
-import com.ibm.team.links.common.registry.ILinkTypeRegistry;
 import com.ibm.team.links.common.service.ILinkService;
 import com.ibm.team.links.service.ILinkServiceLibrary;
 import com.ibm.team.process.common.IProjectArea;
@@ -37,13 +35,9 @@ import com.ibm.team.workitem.common.model.WorkItemLinkTypes;
 public class WorkItemInformationRetriever {
 
 	private static final String APPROVAL_REVIEWER_TYPE = "com.ibm.team.workitem.approvalType.review";
-
 	private static final String TIMESTAMP_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
 
 	private final IWorkItem workItem;
-
-	public static final String RELATED_REVIEW_TYPE = "org.reviewboard.rtc.linktype.relatedreview";
-	public static final IEndPointDescriptor RELATED_REVIEW = ILinkTypeRegistry.INSTANCE.getLinkType(RELATED_REVIEW_TYPE).getTargetEndPointDescriptor();
 
 	private final IRepositoryItemService repositoryItemService;
 	private final ILinkService linkService;

@@ -118,7 +118,7 @@ public class ReviewBoardClient {
 
 	}
 
-	public ReviewParameters reviewParametersFromWorkItem(WorkItemInformationRetriever workItem) throws TeamRepositoryException, URISyntaxException {
+	public ReviewParameters reviewParametersFromWorkItem(WorkItemInformationRetriever workItem) throws TeamRepositoryException, URISyntaxException, ReportWarningException {
 
 		ReviewParameters request = new ReviewParameters();
 

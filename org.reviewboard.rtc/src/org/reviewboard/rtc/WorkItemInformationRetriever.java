@@ -8,6 +8,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import org.reviewboard.rtc.rest.ReportWarningException;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.ibm.team.links.common.ILink;
@@ -34,6 +36,8 @@ import com.ibm.team.workitem.common.model.WorkItemLinkTypes;
 
 public class WorkItemInformationRetriever {
 
+	private static final String UNASSIGNED_WORKITEM = "Can't create review as 'unassigned'. Set work item owner.";
+	private static final String UNASSIGNED = "unassigned";
 	private static final String APPROVAL_REVIEWER_TYPE = "com.ibm.team.workitem.approvalType.review";
 	private static final String TIMESTAMP_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
 
@@ -94,9 +98,13 @@ public class WorkItemInformationRetriever {
 		return handles2userIds(reviewers);
 	}
 
-	public String getOwner() throws TeamRepositoryException {
-
-		return handle2userId(workItem.getOwner());
+	public String getOwner() throws TeamRepositoryException, ReportWarningException {
+		IContributorHandle ownerHandle = workItem.getOwner();
+		String username = handle2userId(ownerHandle);
+		if (UNASSIGNED.equals(username)) {
+			throw new ReportWarningException(UNASSIGNED_WORKITEM);
+		}
+		return username;
 	}
 
 

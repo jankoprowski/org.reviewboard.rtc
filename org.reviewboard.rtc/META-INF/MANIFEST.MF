@@ -13,7 +13,10 @@ Require-Bundle: org.eclipse.core.runtime,
  com.ibm.team.workitem.service;bundle-version="3.1.200",
  com.ibm.team.scm.common;bundle-version="3.1.200",
  com.ibm.team.filesystem.common;bundle-version="3.1.300",
- com.ibm.team.scm.service;bundle-version="3.1.400"
+ com.ibm.team.scm.service;bundle-version="3.1.400",
+ org.mockito.java;bundle-version="1.0.0",
+ org.junit;bundle-version="4.8.1",
+ org.reviewboard.rtc.libs;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: lib/gson-2.2.3.jar,

@@ -2,17 +2,15 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<prerequisites>
-		<maven>3.0</maven>
-	</prerequisites>
+	<parent>
+		<relativePath>../org.reviewboard.rtc.master/pom.xml</relativePath>
+		<groupId>org.reviewboard</groupId>
+		<artifactId>parent</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+	</parent>
 
-	<groupId>org.reviewboard</groupId>
 	<artifactId>org.reviewboard.rtc</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-
-	<properties>
-		<tycho-version>0.18.1</tycho-version>
-	</properties>
+	<packaging>eclipse-plugin</packaging>
 
 	<dependencies>
 		<dependency>
@@ -47,32 +45,9 @@
 		</dependency>
 	</dependencies>
 
-	<repositories>
-		<repository>
-			<id>rtc-sdk</id>
-			<layout>p2</layout>
-			<url>file://C:/RTC/RTC-SDK-4.0.1</url>
-		</repository>
-	</repositories>
-
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<testSourceDirectory>tests</testSourceDirectory>
-		<plugins>
-			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>tycho-maven-plugin</artifactId>
-				<version>${tycho-version}</version>
-				<extensions>true</extensions>
-			</plugin>
-			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>target-platform-configuration</artifactId>
-				<version>${tycho-version}</version>
-				<configuration>
-					<pomDependencies>consider</pomDependencies>
-				</configuration>
-			</plugin>
-		</plugins>
 	</build>
+
 </project>

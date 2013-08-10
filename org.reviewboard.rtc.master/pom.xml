@@ -1,0 +1,73 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<prerequisites>
+		<maven>3.0</maven>
+	</prerequisites>
+
+	<groupId>org.reviewboard</groupId>
+	<artifactId>parent</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<modules>
+		<module>../org.reviewboard.rtc</module>
+		<module>../org.reviewboard.rtc.libs</module>
+		<module>../org.reviewboard.rtc.feature</module>
+		<module>../org.reviewboard.rtc.update-site</module>
+	</modules>
+
+	<properties>
+		<tycho-version>0.18.1</tycho-version>
+	</properties>
+
+
+	<repositories>
+		<repository>
+			<id>rtc</id>
+			<layout>p2</layout>
+			<url>file:///RTC/RTC-SDK-4.0.1</url>
+		</repository>
+	</repositories>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-maven-plugin</artifactId>
+				<version>${tycho-version}</version>
+				<extensions>true</extensions>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>target-platform-configuration</artifactId>
+				<version>${tycho-version}</version>
+				<configuration>
+					<pomDependencies>consider</pomDependencies>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.7</version>
+				<executions>
+					<execution>
+						<phase>install</phase>
+						<configuration>
+							<target>
+								<copy file="../org.reviewboard.rtc.update-site/category.xml"
+									tofile="../org.reviewboard.rtc.update-site/target/repository/site.xml" />
+								<zip destfile="../org.reviewboard.rtc.update-site/target/org.reviewboard.rtc.update-site-1.0.0-SNAPSHOT.zip" update="true">
+									<zipfileset dir="../org.reviewboard.rtc.update-site/target/repository" includes="site.xml" fullpath="/site.xml"/>
+								</zip>
+							</target>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>

@@ -19,9 +19,3 @@ Require-Bundle: org.eclipse.core.runtime,
  org.reviewboard.rtc.libs;bundle-version="1.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Bundle-ClassPath: lib/gson-2.2.3.jar,
- lib/jersey-core-1.17.jar,
- lib/jersey-client-1.17.jar,
- lib/jersey-multipart-1.17.1.jar,
- lib/diffutils-1.2.1.jar,
- .

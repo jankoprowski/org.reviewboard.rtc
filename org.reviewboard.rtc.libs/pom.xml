@@ -11,4 +11,5 @@
 
 	<artifactId>org.reviewboard.rtc.libs</artifactId>
 	<packaging>eclipse-plugin</packaging>
+
 </project>

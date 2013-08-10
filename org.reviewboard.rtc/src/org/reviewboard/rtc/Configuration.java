@@ -29,7 +29,7 @@ public class Configuration {
 	private final IProcessConfigurationElement config;
 	private final IReviewBoardConfigurationProperties properties;
 
-	Configuration(IProcessConfigurationElement config, IReviewBoardConfigurationProperties properties) {
+	public Configuration(IProcessConfigurationElement config, IReviewBoardConfigurationProperties properties) {
 		this.config = config;
 		this.properties = properties;
 	}

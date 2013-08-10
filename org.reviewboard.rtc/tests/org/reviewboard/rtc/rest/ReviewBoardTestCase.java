@@ -1,8 +1,8 @@
 package org.reviewboard.rtc.rest;
 
-import org.reviewboard.rtc.ReviewBoardRepository;
-
 import junit.framework.TestCase;
+
+import org.reviewboard.rtc.ReviewBoardRepository;
 
 public class ReviewBoardTestCase extends TestCase {
 

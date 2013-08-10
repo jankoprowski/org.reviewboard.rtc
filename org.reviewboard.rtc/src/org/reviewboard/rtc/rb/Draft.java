@@ -2,8 +2,6 @@ package org.reviewboard.rtc.rb;
 
 import java.util.Arrays;
 
-import org.reviewboard.rtc.rb.Links;
-
 import com.google.gson.annotations.SerializedName;
 
 

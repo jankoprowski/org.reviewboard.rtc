@@ -91,7 +91,7 @@ public class UnifiedDiffGenerator implements IDiffGenerator {
 				lines.add("+++ " + after.header);
 				lines.add("Binary files were modified.");
 			} else {
-				Patch patch = DiffUtils.diff(before.lines, after.lines);
+				Patch<String> patch = DiffUtils.diff(before.lines, after.lines);
 				List<String> unifiedDiff = DiffUtils.generateUnifiedDiff(before.header, after.header, before.lines, patch, 3);
 				lines.addAll(unifiedDiff);
 			}
